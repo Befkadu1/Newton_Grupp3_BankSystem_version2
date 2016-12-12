@@ -1,7 +1,0 @@
-Listan skapad:	2016-12-08 15:13:10
-2016-12-08          in          1000.0kr          Saldo: 1000.0 kr
-
-2016-12-08          out          100.0kr          Saldo: 900.0 kr
-
-2016-12-08          out          100.0kr          Saldo: 798.0 kr
-

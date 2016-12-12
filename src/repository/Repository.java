@@ -6,7 +6,6 @@
 package repository;
 
 import gui_design_1.Account;
-import gui_design_1.BankLogic;
 import gui_design_1.CreditAccount;
 import gui_design_1.Customer;
 import gui_design_1.SavingsAccount;
@@ -23,13 +22,11 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
-import static java.time.LocalDate.now;
 import java.util.Date;
-import static java.time.LocalDate.now;
 
 /**
  *
- * @author Allan
+ * @author SYSJM2 GRUPP 3
  */
 public class Repository
 {
@@ -62,7 +59,7 @@ public class Repository
         {
             System.out.println(ex.getMessage());
             System.out.println("Fel i Connection till Databas");
-            
+
         }
     }
 
@@ -132,15 +129,14 @@ public class Repository
             ResultSet result = statement.executeQuery("SELECT * FROM transactions WHERE account_accounts_accountID = " + accountID);
             while (result.next())
             {
-                
+
                 int transID = result.getInt("account_accounts_accountID");
                 String date = result.getString("date");
                 double amount = result.getDouble("amount");
                 int accounts_accountID = result.getInt("account_accounts_accountID");
                 double balance_after = result.getDouble("balance_after_tranaction");
                 inOut = result.getString("inout_text");
-                
-               
+
                 Transaktions t = new Transaktions(date, accounts_accountID, amount, Math.round(balance_after * 100.0) / 100.0, inOut);
 
                 repositTransList.add(t);
@@ -183,7 +179,6 @@ public class Repository
 
                 }
             }
- 
 
         } catch (SQLException ex)
         {
@@ -237,7 +232,7 @@ public class Repository
         try
         {
 
-                statement.executeUpdate("INSERT INTO customers (customerName, personalNumber) VALUES ('" + name + "', " + pNr + ")");
+            statement.executeUpdate("INSERT INTO customers (customerName, personalNumber) VALUES ('" + name + "', " + pNr + ")");
 
         } catch (SQLException ex)
         {
@@ -314,7 +309,7 @@ public class Repository
     {
 
         boolean closed = false;
-        
+
         try
         {
             PreparedStatement closeAccount = connection.prepareStatement("DELETE FROM Accounts WHERE accounts_accountID LIKE ? AND customers_personalNumber LIKE ?");
@@ -328,7 +323,7 @@ public class Repository
         {
 
             e.getMessage();
-            
+
             closed = false;
         }
 
@@ -355,7 +350,6 @@ public class Repository
                 check = true;
             }
 
-            
             statement.executeUpdate("UPDATE accounts SET balance = " + newBalance + " WHERE accounts_accountID = " + accountID);
 
             //ResultSet resultTrans = statement.executeQuery("SELECT max(transaction_Id) FROM transactions WHERE account_accounts_accountID = " + accountID);
@@ -384,7 +378,7 @@ public class Repository
 
     public boolean withdraw(int accountID, double amount) throws SQLException
     {
-        
+
         double currentBalance = 0;
         double newBalance = 0;
         boolean depositMade = false;
@@ -404,20 +398,20 @@ public class Repository
                 if (result1.getString("account_type").equals("Savings"))
                 {
 
+                    //if the customer withdraws money for the first time
                     if (freeOrNot == 0)
                     {
-                        if(currentBalance == 0)
+                        //balance is 0 at the beginning and can't withdraw money for the savings account
+                        if (currentBalance == 0)
                         {
                             newBalance = currentBalance;
-                             depositMade = false;
-                        }
-                        else
+                            checkSaving = false;
+                        } else
                         {
-                        newBalance = currentBalance - amount;
-                        checkSaving = true;
+                            newBalance = currentBalance - amount;
+                            checkSaving = true;
+
                         }
-                        
-                        
                     } else if (freeOrNot > 0)
                     {
                         //To protect the saving account above 0, withdrawal interest rate 2 %
@@ -425,6 +419,7 @@ public class Repository
                         {
                             newBalance = currentBalance;
                             checkSaving = false;
+                            depositMade = false;
 
                         } else
                         {
@@ -445,37 +440,44 @@ public class Repository
 
                         checkCredit = true;
                     } //if the sum is above 0
-                    else
-                    {
-                        checkCredit = false;
-                        depositMade = false;
-//                        System.out.println("Kreditgräns -5000");
-                    }
+//                    else
+//                    {
+//                        checkCredit = false;
+//                        depositMade = false;
+////                        System.out.println("Kreditgräns -5000");
+//                    }
 
                 }
-                
+
             }
-            
-            statement.executeUpdate("UPDATE accounts SET firstFreeWithDrawDone = 1 " + " WHERE accounts_accountID = " + accountID); // Updates the "firstFreeWithDrawDone" after the first withdraw is done.
-            
+
 
             ResultSet resultTrans = statement.executeQuery("SELECT max(transaction_Id) FROM transactions ");
 
             //Updating the transaction in the transaktion and accounts tables in the database for the savingsaccount
             if (checkSaving)
             {
+
                 while (resultTrans.next())
                 {
                     transactionCounter = resultTrans.getInt("max(transaction_Id)") + 1;
                     dateFormat2.format(now);
+                    depositMade = true;
 
                 }
 
                 inOut = "ut";
+
                 statement.executeUpdate("UPDATE accounts SET balance = " + newBalance + " WHERE accounts_accountID = " + accountID);
                 statement.executeUpdate("insert into transactions (transaction_Id,date,amount,account_accounts_accountID, balance_after_tranaction, inout_text) values ("
                         + transactionCounter + ",'" + date1 + "'," + amount + "," + accountID + "," + newBalance + " ,'ut')");
 
+                statement.executeUpdate("UPDATE accounts SET firstFreeWithDrawDone = 1 " + " WHERE accounts_accountID = " + accountID); // Updates the "firstFreeWithDrawDone" after the first withdraw is done.
+
+            } else
+            {
+                System.out.println("hi");
+                depositMade = false;
             }
 
             //Updating the transaction in the the transaktion and accounts tables in the database for the credit account
@@ -492,15 +494,16 @@ public class Repository
                         + transactionCounter + ",'" + date1 + "'," + amount + "," + accountID + "," + newBalance + " ,'out')");
                 getAllTransactions(accountID).add(new Transaktions(date1, accountID, -Math.round(amount * 100.0) / 100.0, newBalance, "ut"));
 
-            }
-            else
+            } else
+            {
                 depositMade = false;
+            }
 
         } catch (SQLException ex)
         {
             Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         
 
         return depositMade;
@@ -539,16 +542,16 @@ public class Repository
     {
         Boolean changedName = false;
         try
-            {
-                String updateCustomer = "UPDATE customers SET customerName ='" + name + "' WHERE personalNumber =" + pNr;
-                statement.executeUpdate(updateCustomer);
-                changedName = true;
+        {
+            String updateCustomer = "UPDATE customers SET customerName ='" + name + "' WHERE personalNumber =" + pNr;
+            statement.executeUpdate(updateCustomer);
+            changedName = true;
 
-            }catch (SQLException ex)
-                        {
-                            Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
-                            changedName = false;
-                        }
-                        return changedName;
-                    }
+        } catch (SQLException ex)
+        {
+            Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
+            changedName = false;
+        }
+        return changedName;
+    }
 }
