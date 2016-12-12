@@ -192,7 +192,8 @@ public class BorderPaneTestController implements Initializable
         } else if (nameTextField.getText().matches("[-+.!^:,*/?]"))
         {
             returnMessageToOperator.setText("Namn får endast bestå av bokstäver!");
-        } else if (!nameTextField.getText().matches("^[A-zåäöÅÄÖ-]+$"))
+        } 
+        else if (!nameTextField.getText().matches("^[A-zåäöÅÄÖ-]+$"))
         {
             returnMessageToOperator.setText("Namn får endast bestå av bokstäver!");
         } else
@@ -215,7 +216,9 @@ public class BorderPaneTestController implements Initializable
                 //lägga till kund
                 try
                 {
-                    boolean add = bankLogic.addCustomer(nameTextField.getText(), Long.parseLong(pNrTextField.getText()));
+                    //.replace method is used to replace especial characters, for example if the user 
+                    //writes "Tomas[" in the name box,"[" character will be removed
+                    boolean add = bankLogic.addCustomer(nameTextField.getText().replace("[", "").replace("]", "").trim(), Long.parseLong(pNrTextField.getText()));
 
                     if (add)
                     {
@@ -270,7 +273,7 @@ public class BorderPaneTestController implements Initializable
     @FXML
     private void changeCustumerNameButton(ActionEvent event) throws Exception
     {
-        String name = nameChange.getText();
+        String name = nameChange.getText().replace("[", "").replace("]", "").trim();
 
         Long personalNumber;
         try
@@ -454,6 +457,7 @@ public class BorderPaneTestController implements Initializable
                                 obListtransaktion.add(repo.getAllTransactions(accountID1).get(k).toString2());
 
                             }
+                            break;
 
                         } 
                         else //if(repo.withdraw(accountID1, amount) == false)
@@ -549,7 +553,7 @@ public class BorderPaneTestController implements Initializable
         {
             returnMessageToOperator.setText("Vänligen ange endast siffror!");
 
-        }
+        }          
         else
         {
             try

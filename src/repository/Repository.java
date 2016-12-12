@@ -462,7 +462,7 @@ public class Repository
                 {
                     transactionCounter = resultTrans.getInt("max(transaction_Id)") + 1;
                     dateFormat2.format(now);
-                    depositMade = true;
+                    
 
                 }
 
@@ -473,7 +473,7 @@ public class Repository
                         + transactionCounter + ",'" + date1 + "'," + amount + "," + accountID + "," + newBalance + " ,'ut')");
 
                 statement.executeUpdate("UPDATE accounts SET firstFreeWithDrawDone = 1 " + " WHERE accounts_accountID = " + accountID); // Updates the "firstFreeWithDrawDone" after the first withdraw is done.
-
+                depositMade = true;
             } else
             {
                 System.out.println("hi");
@@ -493,7 +493,7 @@ public class Repository
                 statement.executeUpdate("insert into transactions (transaction_Id,date,amount,account_accounts_accountID, balance_after_tranaction, inout_text) values ("
                         + transactionCounter + ",'" + date1 + "'," + amount + "," + accountID + "," + newBalance + " ,'out')");
                 getAllTransactions(accountID).add(new Transaktions(date1, accountID, -Math.round(amount * 100.0) / 100.0, newBalance, "ut"));
-
+                depositMade = true;
             } else
             {
                 depositMade = false;
