@@ -389,11 +389,12 @@ public class BorderPaneTestController implements Initializable
                     obListCreateAccount.clear();
                     obListCreateAccount.add("Följande konto avslutas");
 
-                    //Adding all the customers' removed account int account ListView
+                    //Adding all the customers' removed account in to the account ListView to show the the bank person
                     Long personalNumber = Long.parseLong(pNrDisplayLabel.getText());// To get a personal number
                     obListCreateAccount.addAll(bankLogic.removeCustomer(personalNumber));
                     accountsListView.setItems(obListCreateAccount);
 
+                    //Updating the customer ListView
                     obListAllCustumers.addAll((List) BankLogic.getAllCustomersArrayList());
                     custumersListView.setItems(obListAllCustumers);
                     obListtransaktion.clear();//To make obListtransaktion empty
@@ -453,21 +454,28 @@ public class BorderPaneTestController implements Initializable
 
         long pNr = 0;
         double amount = 0;
+        
+        //A message if one account not selected for the withdrawal
         if (selectedAccountString == null || selectedCustomerString == null)
         {
             returnMessageToOperator.setText("Vänligen välj konto först.");
 
-        } else if (depositWithDrawAmountField.getText().isEmpty())
+        } 
+        //A message if depositWithDrawAmountField is empty 
+        else if (depositWithDrawAmountField.getText().isEmpty())
         {
             returnMessageToOperator.setText("Vänligen ange en summa!");
-        } else if (!depositWithDrawAmountField.getText().matches(".*[0-9].*"))
+        } 
+        //A message if not a number is writen 
+        else if (!depositWithDrawAmountField.getText().matches(".*[0-9].*"))
         {
             returnMessageToOperator.setText("Vänligen ange endast siffror!");
 
         }
-        else if (depositWithDrawAmountField.getText().matches(".*[+,*].*"))  //to protect for example "+100"
+        //to protect for example "+100" when withdraw
+        else if (depositWithDrawAmountField.getText().matches(".*[+].*"))  
         {
-            returnMessageToOperator.setText("Vänligen ange endast siffror!");
+            returnMessageToOperator.setText("Vänligen ange endast siffror1!");
 
         }
         else
@@ -475,14 +483,19 @@ public class BorderPaneTestController implements Initializable
             try
             {
                 amount = Double.parseDouble(depositWithDrawAmountField.getText());
+                //not possible to write the amount below 0
                 if (amount <= 0)
                 {
                     returnMessageToOperator.setText("Värdet är för lågt eller felaktigt.");
 
-                } else if (amount > 1000000)
+                } 
+                //It is not possible to withdraw above 1 000 000 kronor
+                else if (amount > 1000000)
                 {
                     returnMessageToOperator.setText("Värdet för högt!");
                 }
+                
+                //Withdrawal starts here
                 else
                 {
                 int accountID1 = 1;
@@ -500,9 +513,7 @@ public class BorderPaneTestController implements Initializable
 
                         accountID1 = bankLogic.getAllAccount(pNr).get(i).getAccountID();
                         
-                       // boolean check = repo.withdraw(accountID1, amount);
-   
-                        if (repo.withdraw(accountID1, amount))
+                        if (repo.withdraw(accountID1, amount))  //if withdraw is true
                         {
                             getOnMouseClickedCustListView();
                             getOnMouseClickedAccoutListView();
@@ -516,7 +527,9 @@ public class BorderPaneTestController implements Initializable
                             break;
 
                         } 
-                        else //if(repo.withdraw(accountID1, amount) == false)
+                        
+                        //if withdraw not successfull, for example if the customer wants to take out having 0 kronor in his account
+                        else //if(repo.withdraw(accountID1, amount) == false) 
                         {
                             getOnMouseClickedCustListView();
                             getOnMouseClickedAccoutListView();
@@ -552,28 +565,29 @@ public class BorderPaneTestController implements Initializable
             transactionsListView.setItems(obListtransaktion);
         }
 
-        depositWithDrawAmountField.clear();
+        depositWithDrawAmountField.clear(); 
 
     }
 
+    //To close one account of one customer
     @FXML
     private void closeAccountButton(ActionEvent event) throws Exception
     {
         selectedAccountString = (String) accountsListView.getSelectionModel().getSelectedItem();
-        if (selectedAccountString == null)
+        if (selectedAccountString == null) //if one account not selected
         {
             returnMessageToOperator.setText("Välj specifikt konto som ska avslutas.");
         } else
-        {
-
+        { 
+            //if one account is selected
             for (int j = 0; j < BankLogic.getAllAccountsArrayList(Long.parseLong(pNrDisplayLabel.getText())).size(); j++)
             {
                 if (selectedAccountString.equals(BankLogic.getAllAccountsArrayList(Long.parseLong(pNrDisplayLabel.getText())).get(j).toString2()))
                 {
                     Long personalNumber = Long.parseLong(pNrDisplayLabel.getText());// To get a personal number
                     int accountID = BankLogic.getAllAccountsArrayList(personalNumber).get(j).getAccountID();//To get accountID   
-                    //To show the deleted Account on the transaction window, the result would be printed
-                    //as a text form too, the printer code is written in BankLogic.closeAccount(personalNumber, accountID)
+                    
+                    //To show the deleted Account on the transaction window                    
                     obListCreateAccount.clear();
                     transactionsListView.getItems().clear();
                     obListCreateAccount.add("Följande konto avslutas: ");
@@ -586,6 +600,7 @@ public class BorderPaneTestController implements Initializable
         }
     }
 
+    //To deposit money from the specific account, credit and/or saving account
     @FXML
     private void depositButton(ActionEvent event) throws Exception
     {
@@ -593,19 +608,27 @@ public class BorderPaneTestController implements Initializable
         selectedAccountString = (String) accountsListView.getSelectionModel().getSelectedItem();
         long pNr = 0;
         double amount = 0;
-        if (selectedAccountString == null || selectedCustomerString == null)
+        
+        // A messageif one account not selected to deposit a money
+        if (selectedAccountString == null || selectedCustomerString == null) 
         {
             returnMessageToOperator.setText("Vänligen välj konto först.");
 
-        } else if (depositWithDrawAmountField.getText().isEmpty())
+        } 
+        //A message shown if money not written in depositWithDrawAmountField
+        else if (depositWithDrawAmountField.getText().isEmpty())
         {
             returnMessageToOperator.setText("Vänligen ange ett belopp.");
-        } else if (!depositWithDrawAmountField.getText().matches(".*[0-9].*"))
+        } 
+        //A message if not a number is writen 
+        else if (!depositWithDrawAmountField.getText().matches(".*[0-9].*"))
         {
             returnMessageToOperator.setText("Vänligen ange endast siffror!");
 
         } 
-        else if (depositWithDrawAmountField.getText().matches(".*[+,*].*"))  //to protect for example "+100"
+        
+        //to protect the input not to accept for example "+100"
+        else if (depositWithDrawAmountField.getText().matches(".*[+].*"))  
         {
             returnMessageToOperator.setText("Vänligen ange endast siffror!");
 
@@ -615,7 +638,7 @@ public class BorderPaneTestController implements Initializable
             try
             {
                 amount = Double.parseDouble(depositWithDrawAmountField.getText());
-            } catch (Exception e)
+            } catch (Exception e) //If a letter is written however the expected input is a number
             {
                 returnMessageToOperator.setText("Vänligen ange ett giltligt belopp.");
             }
@@ -662,6 +685,7 @@ public class BorderPaneTestController implements Initializable
 
     }
 
+    //To create new credit account
     @FXML
     private void createNewCreditAccountButton(ActionEvent event) throws Exception
     {
@@ -672,7 +696,7 @@ public class BorderPaneTestController implements Initializable
         Long personalNumber;
         try
         {
-
+            //A message if no customer is selected
             if (selectedCustomerString == null && pNrTextField.getText().isEmpty())
             {
                 returnMessageToOperator.setText("Välj kund från kundlistan.");
@@ -698,7 +722,7 @@ public class BorderPaneTestController implements Initializable
 
                         obListCreateAccount.add(getAccountInformation);
                         accountsListView.setItems(obListCreateAccount);
-                        getOnMouseClickedCustListView();
+                        getOnMouseClickedCustListView(); //To make the selected customer active, make him/her selected
                     }
 
                 }
@@ -711,6 +735,7 @@ public class BorderPaneTestController implements Initializable
 
     }
 
+    //To create new saving account for one customer
     @FXML
     private void createNewSavingsAccountButton(ActionEvent event) throws Exception
     {
@@ -721,6 +746,7 @@ public class BorderPaneTestController implements Initializable
         Long personalNumber;
         try
         {
+            //A message if no customer is selected to create a saving account
             if (selectedCustomerString == null && pNrTextField.getText().isEmpty())
             {
                 returnMessageToOperator.setText("Välj en kund från kundlistan");
