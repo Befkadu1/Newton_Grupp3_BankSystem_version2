@@ -1,43 +1,9 @@
-Listan skapad:	2016-12-12 23:17:54
-2016-12-12          in          1000.0kr          Saldo: 1000.0 kr
+Listan skapad:	2016-12-13 01:06:12
+2016-12-13          in          1000.0kr          Saldo: 1000.0 kr
 
-2016-12-12          ut          100.0kr          Saldo: 898.0 kr
+2016-12-13          ut          100.0kr          Saldo: 900.0 kr
 
-2016-12-12          in          2.0kr          Saldo: 900.0 kr
+2016-12-13          ut          100.0kr          Saldo: 798.0 kr
 
-2016-12-12          ut          2.0kr          Saldo: 897.96 kr
-
-2016-12-12          in          2.0kr          Saldo: 899.96 kr
-
-2016-12-12          ut          2.0kr          Saldo: 897.92 kr
-
-2016-12-12          ut          2.0kr          Saldo: 895.88 kr
-
-2016-12-12          in          2.0kr          Saldo: 897.88 kr
-
-2016-12-12          in          2.0kr          Saldo: 899.88 kr
-
-2016-12-12          ut          2.0kr          Saldo: 897.84 kr
-
-2016-12-12          in          10.0kr          Saldo: 907.84 kr
-
-2016-12-12          in          200.0kr          Saldo: 1107.84 kr
-
-2016-12-12          ut          20.0kr          Saldo: 1087.44 kr
-
-2016-12-12          in          20.0kr          Saldo: 1107.44 kr
-
-2016-12-12          in          20.0kr          Saldo: 1127.44 kr
-
-2016-12-12          ut          20.0kr          Saldo: 1107.04 kr
-
-2016-12-12          ut          100.0kr          Saldo: 1005.04 kr
-
-2016-12-12          ut          100.0kr          Saldo: 903.04 kr
-
-2016-12-12          in          200.0kr          Saldo: 1103.04 kr
-
-2016-12-12          ut          100.0kr          Saldo: 1001.04 kr
-
-2016-12-12          ut          500.0kr          Saldo: 491.04 kr
+2016-12-13          ut          500.0kr          Saldo: 288.0 kr
 

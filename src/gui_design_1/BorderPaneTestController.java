@@ -46,9 +46,9 @@ public class BorderPaneTestController implements Initializable
     @FXML
     private ListView custumersListView; // den första, översta listan i GUI
     @FXML
-    private ListView accountsListView;
+    private ListView accountsListView; // ListView to see the accounts of a specific person
     @FXML
-    private ListView transactionsListView;
+    private ListView transactionsListView;// ListView to see the transaction of one specific account
     @FXML
     private TextField nameTextField; // name-input från användare
     @FXML
@@ -57,8 +57,8 @@ public class BorderPaneTestController implements Initializable
     @FXML
     private TextField depositWithDrawAmountField; // name-input från användare
 
-    private String selectedCustomerString;
-    private String selectedAccountString;
+    private String selectedCustomerString; // To select a customer, the event handler of the listView's MOUSE_CLICKED event
+    private String selectedAccountString; //The event handler of the listView's MOUSE_CLICKED event for one account
 
     private BankLogic bankLogic = BankLogic.getInstance(); // singleton 
 
@@ -71,22 +71,26 @@ public class BorderPaneTestController implements Initializable
     public ObservableList<String> obListtransaktion = FXCollections.observableArrayList();
     Repository repo = new Repository();
 
+    //To print out bank statement or transactions for one account
     @FXML
     private void kontoUtdrag(ActionEvent event) throws Exception
     {
+        
+        //A message to the user if the account is not selected
         if (selectedAccountString == null || selectedCustomerString == null)
         {
             returnMessageToOperator.setText("Välj specifik kund och ett konto.");
         } else
         {
 
-// gets the toString-text of customer from customer list view
+          //the event handler of the listView's MOUSE_CLICKED event for one account
             selectedAccountString = (String) accountsListView.getSelectionModel().getSelectedItem();
             Long pNr = Long.parseLong(pNrDisplayLabel.getText());
             int accountID;
 
-            for (int i = 0; i < bankLogic.getAllAccount(pNr).size(); i++)
+            for (int i = 0; i < bankLogic.getAllAccount(pNr).size(); i++)  //Loops to all accounts of a customer
             {
+                //To get one account selected if the person has several accounts
                 if (bankLogic.getAllAccount(pNr).get(i).toString2().equals(selectedAccountString))
                 {
                     accountID = bankLogic.getAllAccount(pNr).get(i).getAccountID();
@@ -94,17 +98,20 @@ public class BorderPaneTestController implements Initializable
 
                     try
                     {
+                        //To print out the transactions and a file name for the file is "Transaktioner.txt"
                         FileWriter out = new FileWriter("Transaktioner.txt");
                         BufferedWriter bw = new BufferedWriter(out);
                         PrintWriter pw = new PrintWriter(bw);
                         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                         Date date = new Date();
                         pw.println("Listan skapad:" + "\t" + dateFormat.format(date));
+                        
+                        //Printing every line of the transaction
                         for (int j = 0; j < bankLogic.getAllTransactionsArrayList(accountID).size(); j++)
                         {
 
                             bw.write(bankLogic.getAllTransactionsArrayList(accountID).get(j).toString2());
-                            bw.newLine();
+                            bw.newLine();  //to make a new line after every transaction
                         }
                         bw.close();
                     } catch (IOException ex)
@@ -116,21 +123,30 @@ public class BorderPaneTestController implements Initializable
         }
     }
 
+    //To select one customer in the custumersListView
     @FXML
     public final void getOnMouseClickedCustListView()
     {
-        transactionsListView.getItems().clear();
+        transactionsListView.getItems().clear();  // to make empty the transaction ListView
+        
+        //One customer is getting selected using "getSelectionModel().getSelectedItem()"
         selectedCustomerString = (String) custumersListView.getSelectionModel().getSelectedItem();
+        // To reset the return message
         returnMessageToOperator.setText(" ");
+        
+        //Looping to all customers
         for (int i = 0; i < bankLogic.getAllCustomersArrayList().size(); i++)
         {
+            
+            //Comparing or searching for the selected customer
             if (bankLogic.getAllCustomersArrayList().get(i).toString2().equals(selectedCustomerString))
             {
-
+                //To display the name and personal number on nameDisplayLabel and pNrDisplayLabel
                 nameDisplayLabel.setText(bankLogic.getAllCustomersArrayList().get(i).getCustomerName());
                 pNrDisplayLabel.setText(Long.toString(bankLogic.getAllCustomersArrayList().get(i).getPersonalNumber()));
-                obListCreateAccount.clear();
+                obListCreateAccount.clear(); //clears the account Listview and will be filled by the selected customer's accounts
 
+                //To get all accounts of the selected customer above and will be shown on the obListCreateAccount ListView
                 for (int j = 0; j < bankLogic.getAllAccount(bankLogic.getAllCustomersArrayList().get(i).getPersonalNumber()).size(); j++)
                 {
                     long pNr = bankLogic.getAllCustomersArrayList().get(i).getPersonalNumber();
@@ -140,10 +156,13 @@ public class BorderPaneTestController implements Initializable
 
             }
         }
-        accountsListView.setItems(obListCreateAccount);
+        accountsListView.setItems(obListCreateAccount); //accountsListView will be filled by the selected customer's account
 
     }
 
+    /* To select only one account for selected customer in the custumersListView, transactions will be visible on the 
+    transaction ListView, "transactionsListView"
+    */
     @FXML
     public final void getOnMouseClickedAccoutListView()
     {
@@ -156,16 +175,22 @@ public class BorderPaneTestController implements Initializable
         Long pNr = Long.parseLong(pNrDisplayLabel.getText());
 
         int accountID;
-
+        //To reset the return message
         returnMessageToOperator.setText(" ");
+        
+        //Loop to go through all accounts of the selected customer
         for (int i = 0; i < bankLogic.getAllAccount(pNr).size(); i++)
         {
+            /*if statement begins when the selected account,"selectedAccountString" matches with one accounts 
+            (if the customer has more than one account) of the selected customer
+            */
             if (bankLogic.getAllAccount(pNr).get(i).toString2().equals(selectedAccountString))
             {
 
-                accountID = bankLogic.getAllAccount(pNr).get(i).getAccountID();
-                obListtransaktion.clear();
+                accountID = bankLogic.getAllAccount(pNr).get(i).getAccountID();//gets the account number from the database
+                obListtransaktion.clear(); // 1st clears the transactions ListView
 
+                //Fills the transaction ObservableList and transaction ListView by the selected account
                 for (int j = 0; j < bankLogic.getAllTransactionsArrayList(accountID).size(); j++)
                 {
                     obListtransaktion.add(bankLogic.getAllTransactionsArrayList(accountID).get(j).toString2());
@@ -179,6 +204,7 @@ public class BorderPaneTestController implements Initializable
 
     }
 
+    //To add a new customer
     @FXML
     private void addCustomerButton(ActionEvent event) throws Exception
     {
@@ -186,18 +212,25 @@ public class BorderPaneTestController implements Initializable
         if (nameTextField.getText().isEmpty() || pNrTextField.getText().isEmpty()) // om användare inte fyllt i båda fälten, komplettera med instanceOf?
         {
             returnMessageToOperator.setText("Du måste fylla i båda fälten!");
-        } else if (pNrTextField.getText().length() > 12 || pNrTextField.getText().length() < 12)
+        } 
+        //The personal number size should be 12
+        else if (pNrTextField.getText().length() > 12 || pNrTextField.getText().length() < 12)
         {
             returnMessageToOperator.setText("Du måste fylla i 12 siffror!");
-        } else if (nameTextField.getText().matches("[-+.!^:,*/?]"))
-        {
-            returnMessageToOperator.setText("Namn får endast bestå av bokstäver!");
         } 
+        // The user might write these characters by mistake,  -+.!^:,*/?, protection to not crash the program
+        
+//        else if (nameTextField.getText().matches("[.!^:,*/?]"))
+//        {
+//            returnMessageToOperator.setText("Namn får endast bestå av bokstäver1!");
+//        } 
+        //The allowed characters are only A-zåäöÅÄÖ-
         else if (!nameTextField.getText().matches("^[A-zåäöÅÄÖ-]+$"))
         {
-            returnMessageToOperator.setText("Namn får endast bestå av bokstäver!");
+            returnMessageToOperator.setText("Namn får endast bestå av bokstäver2!");
         } else
         {
+            //Verification of the personal number
             //ta bort eventuella bindesträck så att både ååååmmdd-xxxx och ååååmmddxxxx fungerar
             String personNummer = pNrTextField.getText();
             personNummer = personNummer.replaceAll("-", "").trim();
@@ -243,12 +276,13 @@ public class BorderPaneTestController implements Initializable
         }
     }
 
+    //To search for a customer
     @FXML
     private void findCustumerButton(ActionEvent event) throws Exception
     {
-        if (searchTextField.getText().isEmpty())
+        if (searchTextField.getText().isEmpty()) 
         {
-            obListAllCustumers.clear();
+            obListAllCustumers.clear(); //clears the customer ListView, custumersListView
             obListAllCustumers.addAll(bankLogic.getCustomers());
             custumersListView.setItems(obListAllCustumers);
             returnMessageToOperator.setText("Visar alla befintliga kunder");
@@ -257,6 +291,7 @@ public class BorderPaneTestController implements Initializable
             obListFoundCustumers.clear();
             custumersListView.getItems().clear();
 
+            //Searching the customer from the database
             for (int i = 0; i < bankLogic.getAllCustomersArrayList().size(); i++)
             {
                 if (bankLogic.getAllCustomersArrayList().get(i).toString2().toLowerCase().contains(searchTextField.getText().toLowerCase()))
@@ -270,9 +305,11 @@ public class BorderPaneTestController implements Initializable
         }
     }
 
+    //Changing the customer name
     @FXML
     private void changeCustumerNameButton(ActionEvent event) throws Exception
     {
+        //If the bank person writes "[" and "]" by mistake, it will be removed
         String name = nameChange.getText().replace("[", "").replace("]", "").trim();
 
         Long personalNumber;
@@ -281,7 +318,9 @@ public class BorderPaneTestController implements Initializable
             if (nameChange.getText().isEmpty())
             {
                 returnMessageToOperator.setText("Välj kund och ange nytt namn.");
-            } else if (!nameChange.getText().matches("^[A-zåäöÅÄÖ-]+$"))
+            } 
+            //The program only accepts, "^[A-zåäöÅÄÖ-]+$", otherwise a return message will be displayed
+            else if (!nameChange.getText().matches("^[A-zåäöÅÄÖ-]+$"))
             {
                 returnMessageToOperator.setText("Namn får endast bestå av bokstäver!");
             } else
@@ -308,16 +347,18 @@ public class BorderPaneTestController implements Initializable
 
     }
 
+    //Removing the customer
     @FXML
     private void removeCustomersButton(ActionEvent event) throws Exception
     {
+        //Selecting a customer to be removed
         String removeCustomerString = (String) custumersListView.getSelectionModel().getSelectedItem();
         nameTextField.clear();
         pNrTextField.clear();
         if (!pNrTextField.getText().isEmpty())
         {
             returnMessageToOperator.setText("Välj kund att ta bort!");
-        } else if (removeCustomerString == null)
+        } else if (removeCustomerString == null)  // a message if the customer is not selected to be removed
         {
             nameTextField.clear();
             pNrTextField.clear();
@@ -329,8 +370,10 @@ public class BorderPaneTestController implements Initializable
                 nameTextField.clear();
                 pNrTextField.clear();
 
+                //To get the selected customer (to be removed) in the database
                 if (removeCustomerString.equals(bankLogic.getAllCustomersArrayList().get(j).toString2()))
                 {
+                    //If found, a message will be displayed
                     returnMessageToOperator.setText(bankLogic.getAllCustomersArrayList().get(j).getCustomerName() + " borttagen");
 
                     //To clear the observable list in the Account ListView
@@ -361,6 +404,8 @@ public class BorderPaneTestController implements Initializable
         List<String> stringListCustomer = bankLogic.getCustomers();
         try
         {
+            
+            //To print all the customers, and the file name will be Kundlista.txt
             FileWriter out = new FileWriter("Kundlista.txt");
             BufferedWriter bw = new BufferedWriter(out);
             PrintWriter pw = new PrintWriter(bw);
@@ -381,6 +426,7 @@ public class BorderPaneTestController implements Initializable
         }
     }
 
+    //To see all the customers of the bank, it may be usefull after the bank person searches a specific customer
     @FXML
     private void seeAllCustomersButton(ActionEvent event) throws Exception
     {
@@ -389,6 +435,7 @@ public class BorderPaneTestController implements Initializable
         custumersListView.setItems(obListAllCustumers);
     }
 
+    //To withdraw money from the specific account, credit and/or saving account
     @FXML
     private void withDrawButton(ActionEvent event) throws Exception
     {
@@ -469,7 +516,7 @@ public class BorderPaneTestController implements Initializable
 
                                 returnMessageToOperator.setText("Överskriden kreditgräns!");
                             }
-                            else //if (bankLogic.getAllAccount(pNr).get(i).getAccountType().matches("Savings"))
+                            else if (bankLogic.getAllAccount(pNr).get(i).getAccountType().matches("Savings"))
                             {
 
                                 returnMessageToOperator.setText("Du har inte tillräckligt med pengar!");

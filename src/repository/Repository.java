@@ -381,7 +381,7 @@ public class Repository
 
         double currentBalance = 0;
         double newBalance = 0;
-        boolean depositMade = false;
+        boolean depositWithdrawMade = false;
         boolean checkSaving = false;
         boolean checkCredit = false;
         int transactionCounter = 0;
@@ -419,7 +419,6 @@ public class Repository
                         {
                             newBalance = currentBalance;
                             checkSaving = false;
-                            depositMade = false;
 
                         } else
                         {
@@ -443,7 +442,7 @@ public class Repository
 //                    else
 //                    {
 //                        checkCredit = false;
-//                        depositMade = false;
+//                        depositWithdrawMade = false;
 ////                        System.out.println("Kreditgräns -5000");
 //                    }
 
@@ -473,12 +472,12 @@ public class Repository
                         + transactionCounter + ",'" + date1 + "'," + amount + "," + accountID + "," + newBalance + " ,'ut')");
 
                 statement.executeUpdate("UPDATE accounts SET firstFreeWithDrawDone = 1 " + " WHERE accounts_accountID = " + accountID); // Updates the "firstFreeWithDrawDone" after the first withdraw is done.
-                depositMade = true;
-            } else
-            {
-                System.out.println("hi");
-                depositMade = false;
-            }
+                depositWithdrawMade = true;
+            } 
+//            else
+//            {
+//                depositWithdrawMade = false;
+//            }
 
             //Updating the transaction in the the transaktion and accounts tables in the database for the credit account
             if (checkCredit)
@@ -493,11 +492,9 @@ public class Repository
                 statement.executeUpdate("insert into transactions (transaction_Id,date,amount,account_accounts_accountID, balance_after_tranaction, inout_text) values ("
                         + transactionCounter + ",'" + date1 + "'," + amount + "," + accountID + "," + newBalance + " ,'out')");
                 getAllTransactions(accountID).add(new Transaktions(date1, accountID, -Math.round(amount * 100.0) / 100.0, newBalance, "ut"));
-                depositMade = true;
-            } else
-            {
-                depositMade = false;
-            }
+                depositWithdrawMade = true;
+            } 
+          
 
         } catch (SQLException ex)
         {
@@ -506,7 +503,7 @@ public class Repository
 
         
 
-        return depositMade;
+        return depositWithdrawMade;
     }
 
     public boolean removeCustomer(Long pNr)
