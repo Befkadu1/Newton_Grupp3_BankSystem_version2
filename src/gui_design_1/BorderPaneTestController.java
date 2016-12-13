@@ -224,10 +224,11 @@ public class BorderPaneTestController implements Initializable
 //        {
 //            returnMessageToOperator.setText("Namn får endast bestå av bokstäver1!");
 //        } 
+ 
         //The allowed characters are only A-zåäöÅÄÖ-
-        else if (!nameTextField.getText().matches("^[A-zåäöÅÄÖ-]+$"))
+        else if (!nameTextField.getText().matches("^[A-zåäöÅÄÖ -]+$"))
         {
-            returnMessageToOperator.setText("Namn får endast bestå av bokstäver2!");
+            returnMessageToOperator.setText("Namn får endast bestå av bokstäver!");
         } else
         {
             //Verification of the personal number
@@ -251,7 +252,11 @@ public class BorderPaneTestController implements Initializable
                 {
                     //.replace method is used to replace especial characters, for example if the user 
                     //writes "Tomas[" in the name box,"[" character will be removed
-                    boolean add = bankLogic.addCustomer(nameTextField.getText().replace("[", "").replace("]", "").trim(), Long.parseLong(pNrTextField.getText()));
+                    boolean add = bankLogic.addCustomer(nameTextField.getText()
+                            .replace("[", "")
+                            .replace("]", "")
+                            .replace("\\", "")
+                            .trim(), Long.parseLong(pNrTextField.getText()));
 
                     if (add)
                     {
@@ -310,7 +315,11 @@ public class BorderPaneTestController implements Initializable
     private void changeCustumerNameButton(ActionEvent event) throws Exception
     {
         //If the bank person writes "[" and "]" by mistake, it will be removed
-        String name = nameChange.getText().replace("[", "").replace("]", "").trim();
+        String name = nameChange.getText()
+                .replace("[", "")  //to remove if "[" is wrtten by mistake
+                .replace("]", "")  //to remove if "]" is wrtten by mistake
+                .replace("\\", "") //to remove if "\" is wrtten by mistake
+                .trim();
 
         Long personalNumber;
         try
@@ -320,7 +329,7 @@ public class BorderPaneTestController implements Initializable
                 returnMessageToOperator.setText("Välj kund och ange nytt namn.");
             } 
             //The program only accepts, "^[A-zåäöÅÄÖ-]+$", otherwise a return message will be displayed
-            else if (!nameChange.getText().matches("^[A-zåäöÅÄÖ-]+$"))
+            else if (!nameChange.getText().matches("^[A-zåäöÅÄÖ -]+$"))
             {
                 returnMessageToOperator.setText("Namn får endast bestå av bokstäver!");
             } else
